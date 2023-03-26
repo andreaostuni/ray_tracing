@@ -1,12 +1,61 @@
 #include <iostream>
 #include "vec3.hpp"
 #include "color.hpp"
+#include "ray.hpp"
+
+/*
+ *  The ray_color function is the heart of the ray tracer.
+ *  It takes a ray as input and returns a color.
+ *  The ray_color function is called recursively to generate reflections and refractions.
+ *  The ray_color function is also called for each pixel in the image to generate the final image.
+ */
+color ray_color(const ray& r)
+{
+  // we take the unit vector of the ray's direction
+  vec3 unit_direction = unit_vector(r.direction());
+  // we map the y coordinate of the unit vector to the range [0,1]
+  auto t = 0.5 * (unit_direction.y() + 1.0);
+  // we linearly interpolate between white and light blue
+  return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
+}
 
 int main()
 {
   // Image
-  const int image_width = 256;
-  const int image_height = 256;
+  const auto aspect_ratio = 16.0 / 9.0;
+  const int image_width = 400;
+  const int image_height = static_cast<int>(image_width / aspect_ratio);
+
+  // Camera
+  auto viewport_height = 2.0;
+  auto viewport_width = aspect_ratio * viewport_height;  // 16/9 * 2 = 16/9 * 2.0
+  auto focal_length = 1.0;                               // distance between the projection plane and the camera
+
+  // The camera is a virtual camera.
+  // The projection plane is a virtual plane.
+
+  // (-2, 1,-1)  (0, 1, -1)  (2, 1, -1)
+  // |----------------------|
+  // |                      |
+  // |         Y            |
+  // |         ^            |
+  // |         |            |
+  // |         |            |
+  // |         |            |
+  // |         |            |
+  //           -----------------> X
+  //          /
+  //         /
+  //        /
+  //       /
+  //      Z
+
+  // Camera origin is at (0, 0, 0)
+  auto origin = point3(0, 0, 0);                 // camera position
+  auto horizontal = vec3(viewport_width, 0, 0);  // horizontal vector (x axis)
+  auto vertical = vec3(0, viewport_height, 0);   // vertical vector (y axis)
+  // The lower left corner of the projection plane is at (-2, -1, -1)
+  auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - vec3(0, 0, focal_length);
 
   // Render
   // P3 is the magic number for PPM
@@ -19,7 +68,13 @@ int main()
     std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
     for (int i = 0; i < image_width; ++i)
     {
-      color pixel_color(double(i) / (image_width - 1), double(j) / (image_height - 1), 0.25);
+      // the u goes from 0 to 1 from left to right
+      auto u = double(i) / (image_width - 1);
+      // the v goes from 0 to 1 from bottom to top
+      auto v = double(j) / (image_height - 1);
+      // the ray r is casted from the camera origin to the projection plane
+      ray r(origin, lower_left_corner + u * horizontal + v * vertical - origin);
+      color pixel_color = ray_color(r);
       write_color(std::cout, pixel_color);
     }
   }
