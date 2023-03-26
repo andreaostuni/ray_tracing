@@ -7,6 +7,7 @@
 ### Added (1.0.5)
 
 - Chapter 5: Adding a Sphere
+- added function to detect collision between ray and sphere
 
 ## [1.0.4] - 2023-03-26
 
