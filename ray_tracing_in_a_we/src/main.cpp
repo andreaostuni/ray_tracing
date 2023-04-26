@@ -12,17 +12,24 @@
  *  The ray_color function is called recursively to generate reflections and refractions.
  *  The ray_color function is also called for each pixel in the image to generate the final image.
  */
-color ray_color(const ray& r, const hittable& world)
+color ray_color(const ray& r, const hittable& world, int depth)
 {
   hit_record rec;
-  // if the ray hits the sphere, we return a red color
-  if (world.hit(r, 0, infinity, rec))
+
+  if (depth <= 0)
+    return color(0, 0, 0);  // if we've exceeded the ray bounce limit, no more light is gathered
+
+  if (world.hit(r, 0.001, infinity, rec))
   {
     // we compute the normal vector at the point of intersection
     // the normal vector is a unit vector that points outward from the surface
     // the normal vector is computed by subtracting the center of the sphere (0,0,-1)from the point of intersection
     // r.at(t)
-    return 0.5 * (rec.normal + color(1, 1, 1));
+    // in diffuse shading, we compute the color of the point of intersection by adding a random vector to the normal
+    // vector
+    point3 target = rec.p + rec.normal + random_unit_vector();
+    // we return a color that comes from the direction of the random vector
+    return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth - 1);
   }
   // we take the unit vector of the ray's direction
   vec3 unit_direction = unit_vector(r.direction());
@@ -39,6 +46,7 @@ int main()
   const int image_width = 400;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
   const int samples_per_pixel = 100;
+  const int max_depth = 50;
 
   // World
   hittable_list world;
@@ -69,7 +77,7 @@ int main()
         // the ray r is casted from the camera origin to the projection plane
         ray r = cam.get_ray(u, v);
         // we add the color of the ray to the pixel color
-        pixel_color += ray_color(r, world);
+        pixel_color += ray_color(r, world, max_depth);
       }
       write_color(std::cout, pixel_color, samples_per_pixel);
     }

@@ -2,6 +2,11 @@
 
 *Changelog created using the [Simple Changelog](https://marketplace.visualstudio.com/items?itemName=tobiaswaelde.vscode-simple-changelog) extension for VS Code.*
 
+## [1.0.8] - 2023-04-26
+### Added
+- diffuse material model
+
+
 ## [1.0.7] - 2023-04-20
 ### Added
 - camera class
