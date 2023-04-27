@@ -2,6 +2,9 @@
 #define INCLUDE_HITTABLE_HPP_
 
 #include "ray.hpp"
+#include "rtweekend.hpp"
+
+struct material;
 
 struct hit_record
 {
@@ -9,6 +12,8 @@ struct hit_record
   point3 p;
   // the normal vector at the point of intersection
   vec3 normal;
+  // the material of the object that was hit
+  shared_ptr<material> mat_ptr;
   // the distance from the ray origin to the point of intersection
   double t;
   bool front_face;

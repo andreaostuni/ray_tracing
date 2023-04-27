@@ -2,6 +2,11 @@
 
 *Changelog created using the [Simple Changelog](https://marketplace.visualstudio.com/items?itemName=tobiaswaelde.vscode-simple-changelog) extension for VS Code.*
 
+## [1.0.9] - 2023-04-27
+### Added
+- material abstract class and derived classes to handle the scatter
+
+
 ## [1.0.8] - 2023-04-26
 ### Added
 - diffuse material model

@@ -4,6 +4,7 @@
 #include "hittable_list.hpp"
 #include "sphere.hpp"
 #include "camera.hpp"
+#include "material.hpp"
 
 #include <iostream>
 /*
@@ -27,9 +28,12 @@ color ray_color(const ray& r, const hittable& world, int depth)
     // r.at(t)
     // in diffuse shading, we compute the color of the point of intersection by adding a random vector to the normal
     // vector
-    point3 target = rec.p + rec.normal + random_unit_vector();
+    ray scattered;
+    color attenuation;
     // we return a color that comes from the direction of the random vector
-    return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth - 1);
+    if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+      return attenuation * ray_color(scattered, world, depth - 1);
+    return color(0, 0, 0);
   }
   // we take the unit vector of the ray's direction
   vec3 unit_direction = unit_vector(r.direction());
@@ -50,8 +54,16 @@ int main()
 
   // World
   hittable_list world;
-  world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
-  world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
+
+  auto material_ground = make_shared<lambertian>(color(0.8, 0.8, 0.0));
+  auto material_center = make_shared<lambertian>(color(0.9, 0.2, 0.5));
+  auto material_left = make_shared<metal>(color(0.8, 0.8, 0.8), 0.01);
+  auto material_right = make_shared<metal>(color(0.8, 0.6, 0.2), 1.0);
+
+  world.add(make_shared<sphere>(point3(0, -100.5, -1), 100.0, material_ground));
+  world.add(make_shared<sphere>(point3(0, 0, -1), 0.5, material_center));
+  world.add(make_shared<sphere>(point3(-1, 0, -1), 0.5, material_left));
+  world.add(make_shared<sphere>(point3(1, 0, -1), 0.5, material_right));
 
   // Camera
   camera cam;
