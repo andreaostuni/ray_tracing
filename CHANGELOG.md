@@ -2,6 +2,12 @@
 
 *Changelog created using the [Simple Changelog](https://marketplace.visualstudio.com/items?itemName=tobiaswaelde.vscode-simple-changelog) extension for VS Code.*
 
+## [1.0.12] - 2023-05-02
+### Added
+- add a positionable camera
+- add focus blur
+
+
 ## [1.0.10] - 2023-04-27
 ### Added
 - dielectric material
